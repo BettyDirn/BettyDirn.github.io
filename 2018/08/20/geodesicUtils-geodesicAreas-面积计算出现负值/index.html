@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css">
     <title>
         
-        css布局｜BettyDirn&#39;s blog
+        geodesicUtils.geodesicAreas 面积计算出现负值｜BettyDirn&#39;s blog
         
     </title>
 
-    <link rel="canonical" href="https://bettydirn.github.io/2018/07/16/css布局/">
+    <link rel="canonical" href="https://bettydirn.github.io/2018/08/20/geodesicUtils-geodesicAreas-面积计算出现负值/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -137,12 +137,12 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
                 <div class="post-heading">
-                    <h1>css布局</h1>
+                    <h1>geodesicUtils.geodesicAreas 面积计算出现负值</h1>
                     
                     <span class="meta">
                          作者 lmr
                         <span>
-                          日期 2018-07-16
+                          日期 2018-08-20
                          </span>
                     </span>
                     <div class="tags text-center">
@@ -154,7 +154,7 @@
     </div>
     <div class="post-title-haojen">
         <span>
-            css布局
+            geodesicUtils.geodesicAreas 面积计算出现负值
         </span>
     </div>
 </header>
@@ -165,18 +165,30 @@
         <div class="row">
             <!-- Post Container -->
             <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
-                <h2 id="1-position属性"><a href="#1-position属性" class="headerlink" title="1.position属性"></a>1.position属性</h2><p><span>   之前开发过程中，一直关注功能的实现，忽略了样式，导致样式问题不停返工。慢慢的发现，CSS深入研究<br>起来，真的有很多东西值得去深究。</span><br><br>     从接触CSS开始就知道position这个属性，那么position的值，到底都是什么意义？<br>    w3school中对position的定义：<a href="http://www.w3school.com.cn/cssref/pr_class_position.asp" target="_blank" rel="noopener">http://www.w3school.com.cn/cssref/pr_class_position.asp</a><br><br>position值：<br>    ▪ static(默认)：没有定位，元素出现在正常的流中（top,right,bottom,left及z-index属性无效）。<br>    ▪ relative：生成相对定位的元素，相对于其正常位置进行定位。<br>    ▪ absolute：生成绝对定位的元素，相对于 static 定位以外的第一个父元素进行定位。<br>    ▪ fixed：生成绝对定位的元素，相对于浏览器窗口进行定位。<br>    ▪ sticky：盒位置根据正常流计算(这称为正常流动中的位置)，然后相对于该元素在流中的 flow root（BFC）和 containing block（最近的块级祖先元素）定位。在所有情况下（即便被定位元素为 table 时），该元素定位均不对后续元素造成影响。当元素 B 被粘性定位时，后续元素的位置仍按照 B 未定位时的位置来确定。position: sticky 对 table 元素的效果与 position: relative 相同。</p>
+                <h2 id="Arcgis-for-JavaScript-3-x"><a href="#Arcgis-for-JavaScript-3-x" class="headerlink" title="Arcgis for JavaScript(3.x)"></a>Arcgis for JavaScript(3.x)</h2><p>geodesicUtils.geodesicAreas 面积计算出现负值<br>在调用geodesicUtils.geodesicAreas方法计算相交图形面积时，有一条数据出现了负值。<br>部分代码如下：</p>
+<pre><code>var inter = geometryEngine.intersect(that.overfea,count.geometry);
+var leftA = geometryEngine.difference(that.overfea,count.geometry);
+var leftB = geometryEngine.difference(count.geometry,that.overfea);                        
+var inArea = new geodesicUtils.geodesicAreas([inter], esri.Units.SQUARE_KILOMETERS);
+</code></pre><p>查阅资料后发现，<strong>ArcMap中所有面的矢量化方向都是默认设置为顺时针的</strong>。<br>那么出现负值的情况可能是该图形的矢量化方向为逆时针，因此计算面积为负值。</p>
+<p>解决方法：通过reverse() 方法将坐标串顺序反转。</p>
+<pre><code>var inter = geometryEngine.intersect(that.overfea,count.geometry);
+var leftA = geometryEngine.difference(that.overfea,count.geometry);
+var leftB = geometryEngine.difference(count.geometry,that.overfea);
+inter.rings[0].reverse();
+inArea = new geodesicUtils.geodesicAreas([inter], esri.Units.SQUARE_KILOMETERS);
+</code></pre><p>问题解决。</p>
 
                 <hr>
                 
 
                 <ul class="pager">
                     
-                    <li class="previous">
-                        <a href="/2018/08/20/geodesicUtils-geodesicAreas-面积计算出现负值/" data-toggle="tooltip" data-placement="top"
-                           title="geodesicUtils.geodesicAreas 面积计算出现负值">&larr; Previous Post</a>
-                    </li>
                     
+                    <li class="next">
+                        <a href="/2018/07/16/css布局/" data-toggle="tooltip" data-placement="top"
+                           title="css布局">Next Post &rarr;</a>
+                    </li>
                     
                 </ul>
 
@@ -194,7 +206,7 @@
 
             <div class="hidden-xs col-sm-3 toc-col">
                 <div class="toc-wrap">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-position属性"><span class="toc-text">1.position属性</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Arcgis-for-JavaScript-3-x"><span class="toc-text">Arcgis for JavaScript(3.x)</span></a></li></ol>
                 </div>
             </div>
         </div>
