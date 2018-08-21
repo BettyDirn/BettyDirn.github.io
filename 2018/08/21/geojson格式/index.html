@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css">
     <title>
         
-        geodesicUtils.geodesicAreas 面积计算出现负值｜BettyDirn&#39;s blog
+        geojson格式｜BettyDirn&#39;s blog
         
     </title>
 
-    <link rel="canonical" href="https://bettydirn.github.io/2018/08/20/geodesicUtils-geodesicAreas-面积计算出现负值/">
+    <link rel="canonical" href="https://bettydirn.github.io/2018/08/21/geojson格式/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -137,12 +137,12 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
                 <div class="post-heading">
-                    <h1>geodesicUtils.geodesicAreas 面积计算出现负值</h1>
+                    <h1>geojson格式</h1>
                     
                     <span class="meta">
                          作者 lmr
                         <span>
-                          日期 2018-08-20
+                          日期 2018-08-21
                          </span>
                     </span>
                     <div class="tags text-center">
@@ -154,7 +154,7 @@
     </div>
     <div class="post-title-haojen">
         <span>
-            geodesicUtils.geodesicAreas 面积计算出现负值
+            geojson格式
         </span>
     </div>
 </header>
@@ -165,34 +165,105 @@
         <div class="row">
             <!-- Post Container -->
             <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
-                <h2 id="Arcgis-for-JavaScript-3-x"><a href="#Arcgis-for-JavaScript-3-x" class="headerlink" title="Arcgis for JavaScript(3.x)"></a>Arcgis for JavaScript(3.x)</h2><p>geodesicUtils.geodesicAreas 面积计算出现负值<br>在调用geodesicUtils.geodesicAreas方法计算相交图形面积时，有一条数据出现了负值。<br>部分代码如下：</p>
-<pre><code>var inter = geometryEngine.intersect(that.overfea,count.geometry);
-var leftA = geometryEngine.difference(that.overfea,count.geometry);
-var leftB = geometryEngine.difference(count.geometry,that.overfea);                        
-var inArea = new geodesicUtils.geodesicAreas([inter], esri.Units.SQUARE_KILOMETERS);
-</code></pre><p>查阅资料后发现，<strong>ArcMap中所有面的矢量化方向都是默认设置为顺时针的</strong>。<br>那么出现负值的情况可能是该图形的矢量化方向为逆时针，因此计算面积为负值。</p>
-<p>解决方法：通过reverse() 方法将坐标串顺序反转。</p>
-<pre><code>var inter = geometryEngine.intersect(that.overfea,count.geometry);
-var leftA = geometryEngine.difference(that.overfea,count.geometry);
-var leftB = geometryEngine.difference(count.geometry,that.overfea);
-inter.rings[0].reverse();
-inArea = new geodesicUtils.geodesicAreas([inter], esri.Units.SQUARE_KILOMETERS);
-</code></pre><p>问题解决。</p>
+                <h2 id="geojson格式"><a href="#geojson格式" class="headerlink" title="geojson格式"></a>geojson格式</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><ul>
+<li><p>GeoJSON是一种用于编码各种地理数据结构的格式。GeoJSON对象可以表示几何，要素或要素集合。GeoJSON支持以下几何类型：Point，LineString，Polygon，MultiPoint，MultiLineString，MultiPolygon和GeometryCollection。GeoJSON中的功能包含几何对象和其他属性，功能集合表示功能列表。</p>
+</li>
+<li><p>完整的GeoJSON数据结构始终是一个对象（以JSON术语表示）。在GeoJSON中，对象由一组名称/值对组成 - 也称为成员。对于每个成员，名称始终是一个字符串。构件值不是字符串，数字，对象，数组或文字中的一个：true，false，和 null。数组由元素组成，其中每个元素是如上所述的值。</p>
+</li>
+</ul>
+<h3 id="GeoJSON特征集合"><a href="#GeoJSON特征集合" class="headerlink" title="GeoJSON特征集合"></a>GeoJSON特征集合</h3><pre><code>{ &quot;type&quot;: &quot;FeatureCollection&quot;,
+&quot;features&quot;: [
+  { &quot;type&quot;: &quot;Feature&quot;,
+    &quot;geometry&quot;: {&quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [102.0, 0.5]},
+    &quot;properties&quot;: {&quot;prop0&quot;: &quot;value0&quot;}
+    },
+  { &quot;type&quot;: &quot;Feature&quot;,
+    &quot;geometry&quot;: {
+      &quot;type&quot;: &quot;LineString&quot;,
+      &quot;coordinates&quot;: [
+        [102.0, 0.0], [103.0, 1.0], [104.0, 0.0], [105.0, 1.0]
+        ]
+      },
+    &quot;properties&quot;: {
+      &quot;prop0&quot;: &quot;value0&quot;,
+      &quot;prop1&quot;: 0.0
+      }
+    },
+  { &quot;type&quot;: &quot;Feature&quot;,
+     &quot;geometry&quot;: {
+       &quot;type&quot;: &quot;Polygon&quot;,
+       &quot;coordinates&quot;: [
+         [ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0],
+           [100.0, 1.0], [100.0, 0.0] ]
+         ]
+     },
+     &quot;properties&quot;: {
+       &quot;prop0&quot;: &quot;value0&quot;,
+       &quot;prop1&quot;: {&quot;this&quot;: &quot;that&quot;}
+       }
+     }
+   ]
+ }
+</code></pre><h3 id="几何示例"><a href="#几何示例" class="headerlink" title="几何示例"></a>几何示例</h3><p><font color="#00EC00">点</font>：点坐标为x，y顺序（东经，北向为投影坐标，经度，纬度为地理坐标）。</p>
+<pre><code>{ &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [100.0, 0.0] }
+</code></pre><p><font color="#00EC00">线串</font>：LineString的坐标是一个位置数组。</p>
+<pre><code>{ &quot;type&quot;: &quot;LineString&quot;,
+   &quot;coordinates&quot;: [ [100.0, 0.0], [101.0, 1.0] ]
+}
+</code></pre><p><font color="#00EC00">多边形</font>：Polygon的坐标是LinearRing坐标数组的数组。数组中的第一个元素代表外环。任何后续元素代表内环（或孔）。<br>没有孔：    </p>
+<pre><code>{ &quot;type&quot;: &quot;Polygon&quot;,
+&quot;coordinates&quot;: [
+  [ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0] ]
+  ]
+}
+</code></pre><p>带孔：</p>
+<pre><code>{ &quot;type&quot;: &quot;Polygon&quot;,
+&quot;coordinates&quot;: [
+  [ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0] ],
+  [ [100.2, 0.2], [100.8, 0.2], [100.8, 0.8], [100.2, 0.8], [100.2, 0.2] ]
+  ]
+}
+</code></pre><p><font color="#00EC00">多点</font>：MultiPoint的坐标是一系列坐标点。</p>
+<pre><code>{ &quot;type&quot;: &quot;MultiPoint&quot;,
+&quot;coordinates&quot;: [ [100.0, 0.0], [101.0, 1.0] ]
+}
+</code></pre><p><font color="#00EC00">多线</font>：MultiLineString的坐标是LineString坐标数组的数组。</p>
+<pre><code>{ &quot;type&quot;: &quot;MultiLineString&quot;,
+&quot;coordinates&quot;: [
+    [ [100.0, 0.0], [101.0, 1.0] ],
+    [ [102.0, 2.0], [103.0, 3.0] ]
+  ]
+}
+</code></pre><p><font color="#00EC00">多面</font>：MultiPolygon的坐标是多边形坐标数组的数组。</p>
+<pre><code>{ &quot;type&quot;: &quot;MultiPolygon&quot;,
+&quot;coordinates&quot;: [
+  [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],
+  [[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]],
+   [[100.2, 0.2], [100.8, 0.2], [100.8, 0.8], [100.2, 0.8], [100.2, 0.2]]]
+  ]
+}
+</code></pre><p><font color="#00EC00">Geometry集合</font>：GeometryCollection的几何数组中的每个元素都是上述几何对象之一。</p>
+<pre><code>{ &quot;type&quot;: &quot;GeometryCollection&quot;,
+&quot;geometries&quot;: [
+  { &quot;type&quot;: &quot;Point&quot;,
+    &quot;coordinates&quot;: [100.0, 0.0]
+    },
+  { &quot;type&quot;: &quot;LineString&quot;,
+    &quot;coordinates&quot;: [ [101.0, 0.0], [102.0, 1.0] ]
+    }
+ ]
+}
+</code></pre><p>参考地址：<a href="http://www.oschina.net/translate/geojson-spec?cmp" target="_blank" rel="noopener">http://www.oschina.net/translate/geojson-spec?cmp</a><br>原文地址：<a href="http://geojson.org/geojson-spec.html" target="_blank" rel="noopener">http://geojson.org/geojson-spec.html</a></p>
 
                 <hr>
                 
 
                 <ul class="pager">
                     
-                    <li class="previous">
-                        <a href="/2018/08/21/geojson格式/" data-toggle="tooltip" data-placement="top"
-                           title="geojson格式">&larr; Previous Post</a>
-                    </li>
-                    
                     
                     <li class="next">
-                        <a href="/2018/07/16/css布局/" data-toggle="tooltip" data-placement="top"
-                           title="css布局">Next Post &rarr;</a>
+                        <a href="/2018/08/20/geodesicUtils-geodesicAreas-面积计算出现负值/" data-toggle="tooltip" data-placement="top"
+                           title="geodesicUtils.geodesicAreas 面积计算出现负值">Next Post &rarr;</a>
                     </li>
                     
                 </ul>
@@ -211,7 +282,7 @@ inArea = new geodesicUtils.geodesicAreas([inter], esri.Units.SQUARE_KILOMETERS);
 
             <div class="hidden-xs col-sm-3 toc-col">
                 <div class="toc-wrap">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Arcgis-for-JavaScript-3-x"><span class="toc-text">Arcgis for JavaScript(3.x)</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#geojson格式"><span class="toc-text">geojson格式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#概念"><span class="toc-text">概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GeoJSON特征集合"><span class="toc-text">GeoJSON特征集合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#几何示例"><span class="toc-text">几何示例</span></a></li></ol></li></ol>
                 </div>
             </div>
         </div>
